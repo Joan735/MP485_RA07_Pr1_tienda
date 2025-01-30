@@ -1,6 +1,7 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import model.Product;
 import model.Sale;
@@ -30,7 +31,6 @@ public class Shop {
         shop.loadInventory();
         shop.initSession();
 
-        Scanner scanner = new Scanner(System.in);
         int opcion = 0;
         boolean exit = false;
 
@@ -50,7 +50,23 @@ public class Shop {
             System.out.println("9) Remove product");
             System.out.println("10) Leave program");
             System.out.print("Select an option: ");
-            opcion = scanner.nextInt();
+
+            boolean correct = false;
+            do {
+                try {
+                    Scanner sc = new Scanner(System.in);
+                    opcion = sc.nextInt();
+                    if (opcion < 1 || opcion > 10) {
+                        System.err.println("Incorrect number.");
+                        System.out.print("- Try again: ");
+                    }
+                    correct = true;
+                } catch (InputMismatchException e) {
+                    System.err.println("You can only write numbers type Int.");
+                    System.out.print("- Try again: ");
+                }
+            } while (correct == false || opcion < 1 || opcion > 10);
+
             System.out.println("");
 
             switch (opcion) {
@@ -112,7 +128,7 @@ public class Shop {
         System.out.println("Login:");
         do {
             System.out.print("- Enter the employee's number: ");
-            employeeNumber = number();
+            employeeNumber = numberInt();
             System.out.print("- Enter the password: ");
             password = text();
             Employee employee = new Employee(employeeNumber, password, "test");
@@ -135,15 +151,14 @@ public class Shop {
      */
     public void addProduct() {
         System.out.println("2) Add product");
-        Scanner scanner = new Scanner(System.in);
         System.out.print("- Name: ");
-        String name = scanner.nextLine();
+        String name = text();
         Product product = findProduct(name);
         if (product == null) {
             System.out.print("- Wholesaler price: ");
-            double wholesalerPrice = scanner.nextDouble();
+            double wholesalerPrice = numberDouble();
             System.out.print("- Stock: ");
-            int stock = scanner.nextInt();
+            int stock = numberInt();
 
             addProduct(new Product(name, wholesalerPrice, true, stock));
             System.out.println("Product added");
@@ -157,15 +172,14 @@ public class Shop {
      */
     public void addStock() {
         System.out.println("3) Add stock");
-        Scanner scanner = new Scanner(System.in);
         System.out.print("- Enter a product name: ");
-        String name = scanner.next();
+        String name = text();
         Product product = findProduct(name);
 
         if (product != null) {
             // ask for stock
             System.out.print("- Enter the amount to add: ");
-            int stock = scanner.nextInt();
+            int stock = numberInt();
             // update stock product
             product.addStock(stock);
             System.out.println("The stock of the product: " + name + " has been updated to " + product.getStock());
@@ -180,11 +194,10 @@ public class Shop {
      */
     private void setExpired() {
         System.out.println("4) Mark product next expiration");
-        Scanner scanner = new Scanner(System.in);
         System.out.print("- Enter a product name: ");
-        String name = scanner.next();
+        String name = text();
         Product product = findProduct(name);
-        
+
         if (product != null) {
             product.expire();
             System.out.println("The price of the product: " + name + " has been updated to " + product.getPublicPrice());
@@ -214,20 +227,19 @@ public class Shop {
     public void sale() {
         System.out.println("6) Sale");
         // ask for client name
-        Scanner sc = new Scanner(System.in);
         System.out.print("- Make a sale, write the client name: ");
-        String clientName = sc.nextLine();
+        String clientName = text();
         ArrayList<Product> soldProducts = new ArrayList<>();
         // sale product until input name is not 0
         Amount totalAmount = new Amount(0.0);
         String name = "";
-        
+
         while (!name.equals("0")) {
             System.out.println("");
             showInventory();
             System.out.println("");
             System.out.print("- Enter the product name, write 0 to finish: ");
-            name = sc.nextLine();
+            name = text();
             if (name.equals("0")) {
                 break;
             }
@@ -303,7 +315,7 @@ public class Shop {
             return false;
         }
     }
-    
+
     /**
      * find product by name
      *
@@ -332,9 +344,8 @@ public class Shop {
 
     public void removeProduct() {
         System.out.println("9) Remove product");
-        Scanner sc = new Scanner(System.in);
         System.out.print("- Enter the product name to remove it: ");
-        String name = sc.nextLine();
+        String name = text();
         Product product = findProduct(name);
         if (product != null) {
             inventory.remove(product);
@@ -349,8 +360,35 @@ public class Shop {
         return sc.nextLine();
     }
 
-    public int number() {
-        Scanner sc = new Scanner(System.in);
-        return sc.nextInt();
+    public int numberInt() {
+        int number = 0;
+        boolean correct = false;
+        do {
+            try {
+                Scanner sc = new Scanner(System.in);
+                number = sc.nextInt();
+                correct = true;
+            } catch (InputMismatchException e) {
+                System.err.println("You can only write numbers type Int.");
+                System.out.print("- Try again: ");
+            }
+        } while (correct == false);
+        return number;
+    }
+
+    public double numberDouble() {
+        double number = 0;
+        boolean correct = false;
+        do {
+            try {
+                Scanner sc = new Scanner(System.in);
+                number = sc.nextInt();
+                correct = true;
+            } catch (InputMismatchException e) {
+                System.err.println("You can only write numbers type Double.");
+                System.out.print("- Try again: ");
+            }
+        } while (correct == false);
+        return number;
     }
 }
